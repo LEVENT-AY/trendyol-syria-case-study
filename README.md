@@ -56,6 +56,12 @@ flowchart LR
 - Separation of ingestion and serving planes so synchronization load cannot degrade customer traffic.
 - Idempotent processing and auditability across catalog transitions.
 
+## Verification evidence
+
+The private repository's current foundation covers the canonical PostgreSQL ingestion path, transactional outbox, versioned Redis projections, deterministic OpenSearch indexing, and the NestJS/Fastify read API with an **end-to-end Docker verification stack**. The architecture documentation and execution plan are maintained alongside the implementation rather than being reconstructed for this showcase.
+
+The verification model is intentionally rebuildable: derived Redis/OpenSearch state is not treated as canonical truth and can be reproduced from authoritative product data.
+
 ## Key engineering decisions
 
 ### Writes and reads solve different problems
@@ -76,6 +82,7 @@ OpenSearch improves discovery, but authoritative product state remains in Postgr
 | Cache / read models | Redis |
 | Search | OpenSearch |
 | Reliability | Transactional outbox, idempotent processing |
+| Quality | End-to-end Docker verification stack |
 | Product direction | Arabic-first / RTL-first commerce |
 
 ## What this demonstrates
