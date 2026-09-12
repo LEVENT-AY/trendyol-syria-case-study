@@ -7,23 +7,27 @@
 **Public engineering case study by [Levent Aydin](https://github.com/LEVENT-AY)**  
 Senior Full-Stack, Mobile & AI Automation Engineer
 
-> The production implementation is private. This repository documents the architecture, reliability model and product-engineering decisions without publishing proprietary source code or source-access details.
+> The production implementation is private. This repository documents architecture, reliability, and product-engineering decisions without publishing proprietary source code or source-access details.
+
+## 30-second recruiter scan
+
+- **System:** Arabic-first commerce/catalog platform with canonical PostgreSQL ingestion, transactional outbox processing, Redis read projections, OpenSearch indexing, and a fast product API.
+- **My ownership:** ingestion model, canonical data, change detection, projections, search indexing, API delivery, idempotency, and reliability boundaries.
+- **What it proves:** I can design data-intensive systems that isolate slow upstream synchronization from fast customer-facing reads and keep derived search/cache layers rebuildable.
 
 ## At a glance
 
 | | |
 |---|---|
-| **Product type** | Arabic-first commerce and mirrored catalog platform |
-| **Canonical data** | PostgreSQL |
 | **Backend** | Node.js · NestJS · Fastify |
-| **Read acceleration** | Redis projections · OpenSearch |
+| **Canonical data** | PostgreSQL |
+| **Read path** | Redis projections · OpenSearch |
 | **Reliability** | Transactional outbox · idempotent processing |
-| **Engineering focus** | Catalog ingestion · change detection · fast reads · search · auditability |
-| **My role** | Platform foundation, ingestion model, canonical data, projections, search indexing, API delivery and reliability design |
+| **Focus** | Ingestion · change detection · search · auditability |
 
 ## The engineering problem
 
-A customer-facing commerce experience should not inherit the latency or availability of an upstream marketplace. The platform therefore treats catalog synchronization and customer reads as two separate planes with different priorities.
+A customer-facing commerce experience should not inherit the latency or availability of an upstream marketplace. Catalog synchronization and customer reads therefore operate as separate planes with different priorities.
 
 The core principle is: **upstream latency may affect freshness, but it must not become customer-facing application latency**.
 
@@ -34,11 +38,11 @@ flowchart LR
     SRC[Authorized Catalog Source] --> INGEST[Ingestion / Change Detection]
     INGEST --> PG[(Canonical PostgreSQL)]
     PG --> OUTBOX[Transactional Outbox]
-    OUTBOX --> CACHE[Redis Product Projections]
+    OUTBOX --> CACHE[Redis Projections]
     OUTBOX --> SEARCH[OpenSearch Index]
-    CACHE --> API[NestJS / Fastify Product API]
+    CACHE --> API[NestJS / Fastify API]
     SEARCH --> API
-    API --> MOBILE[Arabic-first Mobile Experience]
+    API --> APP[Arabic-first Experience]
 ```
 
 ## What I built and owned
@@ -48,29 +52,20 @@ flowchart LR
 - Transactional outbox separating canonical writes from downstream projections.
 - Versioned Redis product projections for low-latency read paths.
 - Deterministic OpenSearch indexing for catalog discovery.
-- NestJS/Fastify product API optimized around precomputed customer reads.
+- NestJS/Fastify API optimized around precomputed customer reads.
 - Separation of ingestion and serving planes so synchronization load cannot degrade customer traffic.
-- Idempotent processing across product, offer and operational-event workflows.
-- Arabic-first / RTL-first product requirements with normalized searchable source data.
-- Auditability across catalog mutations and operational transitions.
+- Idempotent processing and auditability across catalog transitions.
 
-## Core engineering decisions
+## Key engineering decisions
 
-### 1. Writes and reads solve different problems
+### Writes and reads solve different problems
+Canonical storage prioritizes correctness and traceability; customer read models prioritize latency, searchability, and predictable response shape.
 
-Canonical storage prioritizes correctness and traceability. Customer-facing read models prioritize latency, searchability and predictable response shape.
+### Upstream dependency stays isolated
+Synchronization is asynchronous, so a slow source affects freshness rather than basic application responsiveness.
 
-### 2. Upstream dependency must be isolated
-
-Catalog synchronization is asynchronous. A slow source impacts freshness rather than basic application responsiveness.
-
-### 3. Retry safety is architectural
-
-Ingestion and projection workflows are explicitly idempotent so retries do not duplicate entities or create inconsistent downstream state.
-
-### 4. Search is a derived view, not canonical truth
-
-OpenSearch improves discovery, but authoritative product state remains in PostgreSQL. Search can always be rebuilt deterministically from canonical data.
+### Search is derived, not canonical truth
+OpenSearch improves discovery, but authoritative product state remains in PostgreSQL and the search index can be rebuilt deterministically.
 
 ## Technology
 
@@ -81,14 +76,14 @@ OpenSearch improves discovery, but authoritative product state remains in Postgr
 | Cache / read models | Redis |
 | Search | OpenSearch |
 | Reliability | Transactional outbox, idempotent processing |
-| Product direction | Arabic-first / RTL-first mobile commerce |
+| Product direction | Arabic-first / RTL-first commerce |
 
 ## What this demonstrates
 
-This platform demonstrates **data-intensive system design**: separating ingestion from serving, maintaining canonical truth, building high-performance projections, designing rebuildable search and making retries safe by design.
+Data-intensive system design: separating ingestion from serving, maintaining canonical truth, building low-latency projections, designing rebuildable search, and making retries safe by design.
 
 ---
 
-**Source policy:** private for commercial and IP reasons. No proprietary source code, credentials, upstream access details or private operational configuration are published here.
+**Source policy:** private for commercial and IP reasons. No proprietary source code, credentials, upstream access details, or private operational configuration are published here.
 
 [← Back to my engineering profile](https://github.com/LEVENT-AY)
