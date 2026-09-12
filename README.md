@@ -1,3 +1,7 @@
+![Trendyol Syria engineering case study cover](./assets/hero.svg)
+
+> **Visual overview:** conceptual case-study artwork based on the catalog, ingestion, and search architecture. It does not represent live product inventory, pricing, or production traffic.
+
 # Trendyol Syria — Arabic Commerce & Catalog Platform
 
 **Public engineering case study by [Levent Aydin](https://github.com/LEVENT-AY)**  
